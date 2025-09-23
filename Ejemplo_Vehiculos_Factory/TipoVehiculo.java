@@ -1,0 +1,3 @@
+enum TipoVehiculo {
+    COCHE, MOTOCICLETA, CAMION, BICICLETA
+}
