@@ -1,4 +1,4 @@
-package com.mycompany.practica1cajeroo;
+package practica1cajeroo;
 public class Practica1Cajeroo {
 
     public static void main(String[] args) {

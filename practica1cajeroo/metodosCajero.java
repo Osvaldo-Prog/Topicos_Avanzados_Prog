@@ -1,4 +1,4 @@
-package com.mycompany.practica1cajeroo;
+package practica1cajeroo;
 
 import javax.swing.JOptionPane;
 
