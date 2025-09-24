@@ -1,13 +1,15 @@
 package ATM.Controllers;
 
-import ATM.Views.*;
+import ATM.Views.CajeroView;
 import ATM.CajeroModel;
+import ATM.Strategy.*;
 
 public class CajeroController {
 
     private CajeroModel model;
     private CajeroView view;
     private boolean sistemaActivo;
+    private Operacion operacion;
 
     public CajeroController(CajeroModel model, CajeroView view) {
         this.model = model;
@@ -38,84 +40,57 @@ public class CajeroController {
         while (sesionActiva) {
             view.mostrarMenuPrincipal(model.getCuentaActual().getTitular());
             int opcion = view.leerOpcion();
+
             switch (opcion) {
                 case 1:
-                    consultarSaldo();
+                    setOperacion(new ConsultarSaldo());
+                    ejecutarOperacion(0, null);
                     break;
                 case 2:
-                    this.realizarRetiro();
+                    double montoRetiro = view.solicitarCantidad("Retiro");
+                    setOperacion(new Retiro());
+                    ejecutarOperacion(montoRetiro, null);
                     break;
                 case 3:
-                    this.realizarDeposito();
+                    double montoDeposito = view.solicitarCantidad("Depósito");
+                    setOperacion(new Deposito());
+                    ejecutarOperacion(montoDeposito, null);
                     break;
                 case 4:
-                    this.realizarTransferencia();
+                    String cuentaDestino = view.solicitarCuentaDestino();
+                    double montoTransferencia = view.solicitarCantidad("Transferencia");
+                    setOperacion(new Transferencia());
+                    ejecutarOperacion(montoTransferencia, cuentaDestino);
                     break;
                 case 5:
-                    this.cambiarPin();
+                    String pinActual = view.solicitarPinActual();
+                    String nuevoPin = view.solicitarNuevoPin();
+                    setOperacion(new CambiarNip());
+                    ejecutarOperacionCambioPin(pinActual, nuevoPin);
                     break;
                 case 6:
                     sesionActiva = false;
                     sistemaActivo = false;
                     break;
                 default:
-                    break;
+                    view.mostrarMensaje("Opción inválida");
             }
         }
     }
 
-    public void consultarSaldo() {
-        double saldo = model.consultarSaldo();
-        view.mostrarSaldo(saldo);
-    }
-    public void realizarRetiro() {
-        double cantidad = view.solicitarCantidad("Retirar");
-        if (cantidad <= 0) {
-            view.mostrarMensaje("Error en la cantidad");
-            return;
-        }
-        if (model.realizarRetiro(cantidad)) {
-            view.mostrarMensaje("Retiro exitoso de: $" + cantidad);
-        } else {
-            view.mostrarMensaje("Fondos insuficientes");
-        }
+    public void setOperacion(Operacion operacion) { this.operacion = operacion; }
+
+    public void ejecutarOperacion(double monto, String cuentaDestino) {
+        if (operacion != null)
+            operacion.ejecutar(model.getCuentaActual(), monto, cuentaDestino, model, view);
+        else
+            view.mostrarError("No hay operación seleccionada.");
     }
 
-    public void realizarDeposito() {
-        double cantidad = view.solicitarCantidad("Deposito");
-        if (cantidad <= 0) {
-            view.mostrarMensaje("Error en la cantidad");
-            return;
-        }
-        if (model.realizarDeposito(cantidad)) {
-            view.mostrarMensaje("Deposito de $" + cantidad + " realizado con exito");
-        } else {
-            view.mostrarMensaje("Error al proceder con el deposito");
-        }
-    }
-
-    public void realizarTransferencia() {
-        String cuentaDestino = view.solicitarCuentaDestino();
-        double cantidad = view.solicitarCantidad("Transferencia");
-        if (cantidad <= 0) {
-            view.mostrarError("Error en la transferencia, debes ingresar una cantidad mayor a 0");
-            return;
-        }
-        if (model.realizarTransaccion(cuentaDestino, cantidad)) {
-            view.mostrarMensaje("Transferencia de $" + cantidad + " a la cuenta " + cuentaDestino + " realizada con éxito");
-        } else {
-            view.mostrarMensaje("No se pudo hacer la transferencia, favor de intentar mas tarde o verificar fondos o cuenta");
-        }
-    }
-
-    public void cambiarPin() {
-        String pinActual = view.solicitarPinActual();
-        String nuevoPin = view.solicitarNuevoPin();
-
-        if (model.cambiarNip(pinActual, nuevoPin)) {
-            view.mostrarMensajeExito("El PIN se cambio con éxito");
-        } else {
-            view.mostrarError("El PIN actual es incorrecto, intenta de nuevo");
-        }
+    public void ejecutarOperacionCambioPin(String pinActual, String nuevoPin) {
+        if (operacion != null)
+            operacion.ejecutarCambioPin(model.getCuentaActual(), pinActual, nuevoPin, model, view);
+        else
+            view.mostrarError("No hay operación seleccionada.");
     }
 }

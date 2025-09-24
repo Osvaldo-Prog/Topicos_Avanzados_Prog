@@ -1,8 +1,8 @@
 package ATM;
 
-
 import java.util.HashMap;
 import java.util.Map;
+
 public class CajeroModel {
 
     private Map<String, Cuenta> cuentas;
@@ -14,10 +14,31 @@ public class CajeroModel {
     }
 
     private void inicializarCuentas() {
-        Cuenta<String, String> cuentaGenerica1 = new Cuenta<>("08120", "08120", 9000, "Ambar2");
-        cuentas.put("12345", new Cuenta("12345", "1111", 5000, "Osvaldo"));
-        cuentas.put("56789", new Cuenta("56789", "6789", 7000, "Adrian"));
-        cuentas.put("54321", new Cuenta("54321", "2412", 8600, "Ambar"));
+        // Usando Builder
+        Cuenta cuenta1 = new Cuenta.CuentaBuilder()
+                .numeroCuenta("12345")
+                .pin("1111")
+                .saldo(5000)
+                .titular("Osvaldo")
+                .build();
+
+        Cuenta cuenta2 = new Cuenta.CuentaBuilder()
+                .numeroCuenta("56789")
+                .pin("6789")
+                .saldo(7000)
+                .titular("Adrian")
+                .build();
+
+        Cuenta cuenta3 = new Cuenta.CuentaBuilder()
+                .numeroCuenta("54321")
+                .pin("2412")
+                .saldo(8600)
+                .titular("Ambar")
+                .build();
+
+        cuentas.put(cuenta1.getNumeroCuenta(), cuenta1);
+        cuentas.put(cuenta2.getNumeroCuenta(), cuenta2);
+        cuentas.put(cuenta3.getNumeroCuenta(), cuenta3);
     }
 
     public boolean autenticar(String numeroCuenta, String pin) {
@@ -29,17 +50,16 @@ public class CajeroModel {
         return false;
     }
 
-    public Cuenta getCuentaActual() {
-        return this.cuentaActual;
-    }
+    public Cuenta getCuentaActual() { return cuentaActual; }
 
     public double consultarSaldo() {
-        return this.cuentaActual != null ? cuentaActual.getSaldo() : 0;
+        return cuentaActual != null ? cuentaActual.getSaldo() : 0;
     }
 
     public boolean realizarRetiro(double cantidad) {
-        return this.cuentaActual != null && cuentaActual.retirar(cantidad);
+        return cuentaActual != null && cuentaActual.retirar(cantidad);
     }
+
     public boolean realizarDeposito(double cantidad) {
         if (cuentaActual != null && cantidad > 0) {
             cuentaActual.depositar(cantidad);
@@ -51,7 +71,7 @@ public class CajeroModel {
     public boolean cuentaExistente(String numeroCuenta) {
         return cuentas.containsKey(numeroCuenta);
     }
-    //definir metodo para transferir
+
     public boolean realizarTransaccion(String cuentaDestino, double cantidad) {
         if (cuentaActual != null && cantidad > 0 && cuentaExistente(cuentaDestino)) {
             Cuenta destino = cuentas.get(cuentaDestino);
@@ -62,6 +82,7 @@ public class CajeroModel {
         }
         return false;
     }
+
     public boolean cambiarNip(String pinActual, String nuevoPin) {
         if (cuentaActual != null && cuentaActual.validarPin(pinActual)) {
             cuentaActual.setPin(nuevoPin);
@@ -69,7 +90,4 @@ public class CajeroModel {
         }
         return false;
     }
-
 }
-
-

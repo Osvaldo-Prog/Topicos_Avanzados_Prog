@@ -1,45 +1,29 @@
 package ATM;
 
-public class Cuenta <ID, PIN> {
+public class Cuenta {
 
-    private ID numeroCuenta;
-    private PIN pin;
+    private String numeroCuenta;
+    private String pin;
     private double saldo;
     private String titular;
 
-    public Cuenta(ID numeroCuenta, PIN pin, double saldoInicial, String titular) {
-        this.numeroCuenta = numeroCuenta;
-        this.pin = pin;
-        this.saldo = saldoInicial;
-        this.titular = titular;
+    private Cuenta(CuentaBuilder builder) {
+        this.numeroCuenta = builder.numeroCuenta;
+        this.pin = builder.pin;
+        this.saldo = builder.saldo;
+        this.titular = builder.titular;
     }
 
-    public ID getNumeroCuenta() {
-        return numeroCuenta;
-    }
+    public String getNumeroCuenta() { return numeroCuenta; }
+    public String getPin() { return pin; }
+    public double getSaldo() { return saldo; }
+    public String getTitular() { return titular; }
 
-    public PIN getPin() {
-        return pin;
-    }
-
-    public double getSaldo() {
-        return saldo;
-    }
-
-    public String getTitular() {
-        return titular;
-    }
-
-    public boolean validarPin(String pinIngresado) {
-        return this.pin.equals(pinIngresado);
-    }
-
-    public void setPin(PIN nuevoPin) {
-        this.pin = nuevoPin;
-    }
+    public boolean validarPin(String pinIngresado) { return this.pin.equals(pinIngresado); }
+    public void setPin(String nuevoPin) { this.pin = nuevoPin; }
 
     public boolean retirar(double cantidad) {
-        if (cantidad > 0 && cantidad <= this.saldo) {
+        if (cantidad > 0 && cantidad <= saldo) {
             saldo -= cantidad;
             return true;
         }
@@ -47,12 +31,24 @@ public class Cuenta <ID, PIN> {
     }
 
     public void depositar(double cantidad) {
-        if (cantidad > 0) {
-            saldo += cantidad;
-        }
+        if (cantidad > 0) saldo += cantidad;
     }
-    //Tarea, diseñar los comportamientos restantes, transferir, cambiar nip
+
     public void transferir(double cantidad) {
         saldo -= cantidad;
+    }
+
+    // 🔹 Builder simple
+    public static class CuentaBuilder {
+        private String numeroCuenta;
+        private String pin;
+        private double saldo;
+        private String titular;
+
+        public CuentaBuilder numeroCuenta(String numeroCuenta) { this.numeroCuenta = numeroCuenta; return this; }
+        public CuentaBuilder pin(String pin) { this.pin = pin; return this; }
+        public CuentaBuilder saldo(double saldo) { this.saldo = saldo; return this; }
+        public CuentaBuilder titular(String titular) { this.titular = titular; return this; }
+        public Cuenta build() { return new Cuenta(this); }
     }
 }
