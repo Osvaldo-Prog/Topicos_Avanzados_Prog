@@ -53,6 +53,6 @@ public class ClienteModel {
         "\nNombre: " + nombre + 
         "\nEmail: " + email + 
         "\nTelefono: " + telefono +
-        "\nSaldo: $" + saldo + "\n---------------------------------";    }
+        "\nSaldo: $" + saldo + "\n---------------------------------------------------";    }
 
  }

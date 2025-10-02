@@ -14,10 +14,17 @@ public class Cuenta {
         this.titular = builder.titular;
     }
 
-    public String getNumeroCuenta() { return numeroCuenta; }
-    public String getPin() { return pin; }
-    public double getSaldo() { return saldo; }
-    public String getTitular() { return titular; }
+    public String getNumeroCuenta() { 
+        return numeroCuenta; }
+        
+    public String getPin() {
+         return pin; }
+
+    public double getSaldo() { 
+        return saldo; }
+
+    public String getTitular() {
+         return titular; }
 
     public boolean validarPin(String pinIngresado) { return this.pin.equals(pinIngresado); }
     public void setPin(String nuevoPin) { this.pin = nuevoPin; }
@@ -38,17 +45,26 @@ public class Cuenta {
         saldo -= cantidad;
     }
 
-    // 🔹 Builder simple
+    // Patron builder para la cuenta
     public static class CuentaBuilder {
         private String numeroCuenta;
         private String pin;
         private double saldo;
         private String titular;
 
-        public CuentaBuilder numeroCuenta(String numeroCuenta) { this.numeroCuenta = numeroCuenta; return this; }
-        public CuentaBuilder pin(String pin) { this.pin = pin; return this; }
-        public CuentaBuilder saldo(double saldo) { this.saldo = saldo; return this; }
-        public CuentaBuilder titular(String titular) { this.titular = titular; return this; }
-        public Cuenta build() { return new Cuenta(this); }
+        public CuentaBuilder numeroCuenta(String numeroCuenta) { 
+            this.numeroCuenta = numeroCuenta; return this; }
+
+        public CuentaBuilder pin(String pin) { 
+            this.pin = pin; return this; }
+
+        public CuentaBuilder saldo(double saldo) { 
+            this.saldo = saldo; return this; }
+
+        public CuentaBuilder titular(String titular) { 
+            this.titular = titular; return this; }
+
+        public Cuenta build() { 
+            return new Cuenta(this); }
     }
 }

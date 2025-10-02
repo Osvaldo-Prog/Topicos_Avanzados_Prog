@@ -1,12 +1,16 @@
 package ATM.Strategy;
+
+import ATM.Cuenta;
 import ATM.CajeroModel;
-public class Transferencia implements Operacion{
+import ATM.Views.CajeroView;
+
+public class Transferencia implements Operacion {
     @Override
-    public void ejecutar(CajeroModel cajero, double cantidad, String cuentaDestino) {
-        if (cajero.realizarTransaccion(cuentaDestino, cantidad)) {
-            System.out.println("Transferencia realizada a " + cuentaDestino);
+    public void ejecutar(Cuenta cuenta, double monto, String cuentaDestino, CajeroModel model, CajeroView view) {
+        if (model.realizarTransaccion(cuentaDestino, monto)) {
+            view.mostrarMensajeExito("Transferencia de $" + monto + " a " + cuentaDestino + " realizada con éxito");
         } else {
-            System.out.println("Error en la transferencia.");
+            view.mostrarError("No se pudo realizar la transferencia");
         }
     }
 }

@@ -62,7 +62,7 @@ public class InventarioModel {
         "\nPrecio: $" + precio +
         "\nCantidad: " + cantidad +
         "\nCategoria: " + categoria + 
-        "\nFecha de vencimiento: " + fechaVencimiento + "\n-------------------------";
+        "\nFecha de vencimiento: " + fechaVencimiento + "\n-----------------------------------------------------";
     }
 
 }

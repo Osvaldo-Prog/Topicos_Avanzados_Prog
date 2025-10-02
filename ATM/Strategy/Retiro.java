@@ -4,7 +4,7 @@ import ATM.Cuenta;
 import ATM.CajeroModel;
 import ATM.Views.CajeroView;
 
-public class Retiro implements Operacion {
+public abstract class Retiro implements Operacion {
     @Override
     public void ejecutar(Cuenta cuenta, double monto, String cuentaDestino, CajeroModel model, CajeroView view) {
         if (model.realizarRetiro(monto)) {

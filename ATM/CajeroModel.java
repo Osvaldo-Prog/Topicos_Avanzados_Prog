@@ -22,6 +22,7 @@ public class CajeroModel {
                 .titular("Osvaldo")
                 .build();
 
+        //Builder 2
         Cuenta cuenta2 = new Cuenta.CuentaBuilder()
                 .numeroCuenta("56789")
                 .pin("6789")

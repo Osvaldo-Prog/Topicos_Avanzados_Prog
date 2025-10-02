@@ -11,4 +11,6 @@ public interface Operacion {
 
     // Para cambiar PIN
     default void ejecutarCambioPin(Cuenta cuenta, String pinActual, String nuevoPin, CajeroModel model, CajeroView view) {}
+
+    //Me falta implementar todos los metodos de las clases
 }

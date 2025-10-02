@@ -1,23 +1,26 @@
 package Controller;
 /*  ~Stretegy con parametro global para switchear enre interfaz grafica y consola con strategy
-    ~mover los textArea y JSCROLL A LA VISTA, ESO NO DEBE ESTAR EN EL CONTROLADOR, en pocas palabras, no poner ningunJOptionPaneo sout en el controllador*/
-import javax.swing.JOptionPane;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import java.awt.Dimension;
+    ~mover los textArea y JSCROLL A LA VISTA, ESO NO DEBE ESTAR EN EL CONTROLADOR, en pocas palabras, no poner ningunJOptionPane o sout en el controllador*/
+/* Cambios hechos aqui, quitar los JOptionPane y pasarlos a SistemaViewJ 
+ * con ese cambio se creo la interface ViewGlobal (Strategy) que tiene todos los metodos para asi decidir que estrategia de vista usará
+ * metodos modificados que tenian el JOptionPane aqui -> listarClientes();, listarProductos();, mostrarDetalleCliente();, mostrarDetalleProducto();
+ *
+*/
 
 import Model.ClienteModel;
 import Model.InventarioModel;
 import Model.ListaGenerica;
-//import View.SistemaView;
 import View.SistemaViewJ;
+//import View.SistemaView;
+//import View.SistemaViewJ;
+import View.ViewGlobal;
 
 public class SistemaController {
     private final ListaGenerica<InventarioModel> listaInventario;
     private final ListaGenerica<ClienteModel> listaClientes;
-    private final SistemaViewJ view;
+    private final ViewGlobal view;
 
-    public SistemaController(SistemaViewJ view) {
+    public SistemaController(ViewGlobal view) {
         this.view = view;
         this.listaInventario = new ListaGenerica<>();
         this.listaClientes = new ListaGenerica<>();
@@ -203,7 +206,7 @@ public class SistemaController {
     public void eliminarProducto() {
         String codigo = view.pedirCodigo();
         for (int i = 0; i < listaInventario.size(); i++) {
-            if (listaInventario.get(i).getCodigo().equalsIgnoreCase(codigo)) {
+            if (listaInventario.get(i).getCodigo().equals(codigo)) {
                 listaInventario.get(i).totalProductos -= listaInventario.get(i).getCantidad();
                 listaInventario.eliminar(i);
                 view.mensaje("Producto eliminado");
@@ -263,6 +266,7 @@ public class SistemaController {
                         fechaVencimiento);
                 listaInventario.actualizar(i, productoMod);
                 view.mensaje("Producto modificado: " + productoMod.getNombre());
+                break;
             } else {
                 view.error("Producto no encontrado");
             }
@@ -271,52 +275,27 @@ public class SistemaController {
 
     /**
      * Lista todos los clientes registrados en el sistema.
+     * se añadió una condicion para saber si se esta trabajando con la view de consola o la de GUI
+     * el instanceof es un operador para definir el tipo de view con el que se esta trabajando,
+     * la condicion dice que si es la view es la de SistemaViewJ se usara la GUI y si no la de consola, es decir el SistemView 
      */
-    // -----------------CAMBIAR A METODO TOSTRING Y CON SCROLL PARA MOSTRAR LA LISTA
-    // Se creo un JTextArea y un JScrollPane para mostrar la lista en una sola
-    // ventana y lo mismo con la lista de productos
     public void listarClientes() {
-        StringBuilder sbListaClientes = new StringBuilder();
-        sbListaClientes.append("=====Lista de Clientes=====\n");
-        for (int i = 0; i < listaClientes.size(); i++) {
-            ClienteModel cliente = listaClientes.get(i);
-            sbListaClientes.append((i + 1)).append(". ").append(cliente.toString()).append("\n");
+        if(view instanceof SistemaViewJ){
+            view.listadoClientes(listaClientes);
+        }else{
+        System.out.println(view.listadoClientes(listaClientes));
         }
-        // Crear el area de texto
-        JTextArea areaTextoClientes = new JTextArea(sbListaClientes.toString(), 10, 30);
-        areaTextoClientes.setEditable(false);
-        areaTextoClientes.setCaretPosition(0);
-        areaTextoClientes.setWrapStyleWord(true);
-
-        // Crear la ventana Scrolleable
-        JScrollPane ventanaScroll = new JScrollPane(areaTextoClientes);
-        ventanaScroll.setPreferredSize(new Dimension(400, 250));
-
-        JOptionPane.showMessageDialog(null, ventanaScroll, "Lista de clientes", JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
      * Lista todos los productos en el inventario.
      */
     public void listarProductos() {
-        StringBuilder sbListaProductos = new StringBuilder();
-        sbListaProductos.append("----------- Lista de Productos -----------\n");
-        for (int i = 0; i < listaInventario.size(); i++) {
-            InventarioModel producto = listaInventario.get(i);
-            sbListaProductos.append((i + 1)).append(". ").append(producto.toString()).append("\n");
+        if(view instanceof SistemaViewJ){
+        view.listadoProductos(listaInventario);
+        }else{
+            System.out.println(view.listadoProductos(listaInventario));
         }
-
-        // Crear la JTextArea para lista de productos
-        JTextArea areaTextoProductos = new JTextArea(sbListaProductos.toString(), 20, 30);
-        areaTextoProductos.setEditable(false);
-        areaTextoProductos.setCaretPosition(0);
-        areaTextoProductos.setWrapStyleWord(true);
-
-        // Crear el scroll para la ventana de la lisat de productos
-        JScrollPane ventanaScrollProductos = new JScrollPane(areaTextoProductos);
-        ventanaScrollProductos.setPreferredSize(new Dimension(400, 300));
-        JOptionPane.showMessageDialog(null, ventanaScrollProductos, "Lista de productos",
-                JOptionPane.INFORMATION_MESSAGE);
     }
 
     /**
@@ -349,36 +328,14 @@ public class SistemaController {
 
     /**
      * Muestra los detalles de un cliente dado su ID.
-     * Este antes estaba en el view, pero ahora en el view solo se manda a llamar
      * @param id El ID del cliente cuyos detalles se desean mostrar.
+     * @param listaClientes es la lista de los clientes pero en este caso en la lista solo se mostrará el cliente cuyo ID se ingreso
      */
     public void mostrarDetallesCliente(int id) {
-        StringBuilder sbDetallesCliente = new StringBuilder();
-        for (int i = 0; i < listaClientes.size(); i++) {
-            if (listaClientes.get(i).getId() == id) {
-                ClienteModel cliente = listaClientes.get(i);
-                sbDetallesCliente.append("\n---------- Detalles del Cliente ----------\n")
-                        .append("ID: ").append(cliente.getId()).append("\n")
-                        .append("Nombre: ").append(cliente.getNombre()).append("\n")
-                        .append("Email: ").append(cliente.getEmail()).append("\n")
-                        .append("Telefono: ").append(cliente.getTelefono()).append("\n")
-                        .append("Saldo: ").append(cliente.getSaldo()).append("\n--------------------------");
-
-                // Crear un textArea para guardar la informacion
-                JTextArea areaTextoDetallesCliente = new JTextArea(sbDetallesCliente.toString(), 30, 30);
-                areaTextoDetallesCliente.setEditable(false);
-                areaTextoDetallesCliente.setCaretPosition(0);
-                areaTextoDetallesCliente.setWrapStyleWord(true);
-                areaTextoDetallesCliente.setLineWrap(true);
-
-                // Crear un ScrollPane para mostarlo
-                JScrollPane scrollPaneDetallesCliente = new JScrollPane(areaTextoDetallesCliente);
-                scrollPaneDetallesCliente.setPreferredSize(new Dimension(400, 400));
-
-                JOptionPane.showMessageDialog(null, scrollPaneDetallesCliente, "Detalles del cliente",
-                        JOptionPane.INFORMATION_MESSAGE);
-                break;
-            }
+        if(view instanceof SistemaViewJ){
+        view.mostrarDetalleCliente(listaClientes, id);
+        }else{
+            System.out.println(view.mostrarDetalleCliente(listaClientes, id));
         }
     }
 
@@ -416,34 +373,10 @@ public class SistemaController {
      * @param codigo El código del producto cuyos detalles se desean mostrar.
      */
     public void mostrarDetallesProducto(String codigo) {
-        StringBuilder sbDetallesProducto = new StringBuilder();
-        for (int i = 0; i < listaInventario.size(); i++) {
-            if (listaInventario.get(i).getCodigo().equals(codigo)) {
-                InventarioModel producto = listaInventario.get(i);
-                sbDetallesProducto.append("\n---------- Detalles del Producto ----------\n")
-                        .append("Codigo: ").append(producto.getCodigo()).append("\n")
-                        .append("Nombre: ").append(producto.getNombre()).append("\n")
-                        .append("Precio: $").append(producto.getPrecio()).append("\n")
-                        .append("Cantidad: ").append(producto.getCantidad()).append("\n")
-                        .append("Categoria: ").append(producto.getCategoria()).append("\n")
-                        .append("Fecha de vencimiento: ").append(producto.getFechaVencimiento())
-                        .append("\n----------------------------");
-
-                // Crear un JTextArea para mostrar los detalles del producto
-                JTextArea areaTextoDetallesProducto = new JTextArea(sbDetallesProducto.toString(), 20, 30);
-                areaTextoDetallesProducto.setEditable(false);
-                areaTextoDetallesProducto.setCaretPosition(0);
-                areaTextoDetallesProducto.setWrapStyleWord(true);
-                areaTextoDetallesProducto.setLineWrap(true);
-
-                // Crear el JScrollPane para mostrar el textArea
-                JScrollPane scrollDetallesProductos = new JScrollPane(areaTextoDetallesProducto);
-                scrollDetallesProductos.setPreferredSize(new Dimension(400, 450));
-
-                JOptionPane.showMessageDialog(null, scrollDetallesProductos, "Detalles del producto",
-                        JOptionPane.INFORMATION_MESSAGE);
-                break;
-            }
+        if(view instanceof SistemaViewJ){
+       view.mostrarDetallesProducto(listaInventario, codigo);
+        }else{
+            System.out.println(view.mostrarDetallesProducto(listaInventario, codigo));
         }
     }
 
@@ -454,7 +387,7 @@ public class SistemaController {
     public void menuBuscar() {
         boolean salir = false;
         while (!salir) {
-            int opcion = view.menuBuscarProd();
+            int opcion = view.menuBuscarProductos();
             switch (opcion) {
                 case 1 -> {
                     buscarProductoByNombre();
@@ -498,8 +431,7 @@ public class SistemaController {
         for (int i = 0; i < listaClientes.size(); i++) {
             ClienteModel cliente = listaClientes.get(i);
             if (cliente.getId() == id) {
-                //Este Pane no va aqui, va un view.mensaje y dando el mensaje de error
-                JOptionPane.showMessageDialog(null, "Ingresa otro ID, ese ya existe");
+                view.error("Error, el ID ya existe, ingresa otro");
                 return true;
             }
         }
@@ -512,7 +444,7 @@ public class SistemaController {
         for (int i = 0; i < listaInventario.size(); i++){
             InventarioModel producto = listaInventario.get(i);
             if(producto.getCodigo().equals(codigo)){
-                JOptionPane.showMessageDialog(null, "Ingresa otro codigo, ese ya existe en otro producto");
+                view.error("Error, el codigo de producto ya es existente, ingresa otro");
                 return true;
             }
         }

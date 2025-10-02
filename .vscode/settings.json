@@ -1,0 +1,13 @@
+{
+    "java.project.sourcePaths": [
+        ".",
+        "DAO",
+        "Ejemplo_Vehiculos_Factory",
+        "Practica1(Factory)",
+        "srcExamen"
+    ],
+    "java.project.referencedLibraries": [
+        "c:\\Users\\xMKZx\\OneDrive\\Escritorio\\mysql-connector-j-9.2.0.jar",
+        "test-lib\\**\\*.jar"
+    ]
+}
